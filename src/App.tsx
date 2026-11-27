@@ -43,7 +43,7 @@ const navigation = {
 };
 export default function App() { return <AppProvider><Workspace /></AppProvider>; }
 function Workspace() {
-  const { db, user, error, logout } = useApp();
+  const { db, user, error, authFlow, logout } = useApp();
   const { screen, selectedId, navigate: route } = useNavigation();
   const [mobile, setMobile] = useState(false);
   const navigate = (next: string, id?: number) => { route(next, id); setMobile(false); };
@@ -56,7 +56,7 @@ function Workspace() {
   }, [user?.id]);
   if (error) return <div className="p-8"><EmptyState title="No se pudo conectar con EventUdeA" text={error} action={<Button onClick={() => location.reload()}>Reintentar</Button>} /></div>;
   if (!db) return <div className="min-h-screen grid place-content-center gap-5 text-center" role="status"><Logo /><p>Conectando con EventUdeA…</p></div>;
-  if (!user) return <AuthPage />;
+  if (!user || authFlow === "recovery") return <AuthPage />;
   const nav = navigation[user.role];
   const allowed = nav.some(n => n.screen === screen) || (user.role === "asistente" && screen === "event-detail");
   const selected = visibleEvents(db, user).find(e => e.id === selectedId);
