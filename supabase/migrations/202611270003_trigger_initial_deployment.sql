@@ -1,0 +1,2 @@
+-- No-op migration to trigger the first GitHub-to-Supabase production deployment.
+-- The schema is created by the two preceding migrations.
