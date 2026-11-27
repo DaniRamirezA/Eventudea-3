@@ -20,7 +20,7 @@ export class SupabaseRepository {
     const [categories, venues, events, templates] = await Promise.all([
       get("/rest/v1/categories?select=id,name,description,is_active&order=name", !!userId),
       get("/rest/v1/venues?select=id,name,campus,capacity,is_active&order=name", !!userId),
-      get("/rest/v1/events?select=*,categories(name),venues(name),profiles(full_name)&order=event_date.asc", !!userId),
+      get("/rest/v1/events?select=*,categories(name),venues(name)&order=event_date.asc", !!userId),
       userId ? get("/rest/v1/certificate_templates?select=*&order=id", true) : Promise.resolve([]),
     ]);
     let users: User[] = [];
