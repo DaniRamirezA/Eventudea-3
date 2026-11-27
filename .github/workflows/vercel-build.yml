@@ -1,0 +1,36 @@
+name: Vercel build check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Type-check
+        run: pnpm exec tsc --noEmit
+      - name: Build Next.js for Vercel
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://mzyrrgoaphzevirvngrm.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-publishable-key
