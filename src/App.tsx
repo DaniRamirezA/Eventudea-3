@@ -54,8 +54,8 @@ function Workspace() {
       if (!valid) route(user.role === "asistente" ? "events" : "dashboard");
     }
   }, [user?.id]);
-  if (error) return <div className="p-8"><EmptyState title="No se pudo abrir el almacenamiento local" text={error} action={<Button onClick={() => location.reload()}>Reintentar</Button>} /></div>;
-  if (!db) return <div className="min-h-screen grid place-content-center gap-5 text-center" role="status"><Logo /><p>Abriendo tus datos locales…</p></div>;
+  if (error) return <div className="p-8"><EmptyState title="No se pudo conectar con EventUdeA" text={error} action={<Button onClick={() => location.reload()}>Reintentar</Button>} /></div>;
+  if (!db) return <div className="min-h-screen grid place-content-center gap-5 text-center" role="status"><Logo /><p>Conectando con EventUdeA…</p></div>;
   if (!user) return <AuthPage />;
   const nav = navigation[user.role];
   const allowed = nav.some(n => n.screen === screen) || (user.role === "asistente" && screen === "event-detail");
@@ -78,7 +78,7 @@ function Workspace() {
   </>;
   const navContent = <><Logo /><div className="role-chip"><ShieldCheck size={15} />{labels[user.role]}</div><nav aria-label="Navegación principal" className="min-h-0 overflow-y-auto">{nav.map(n => <Button key={n.screen} variant="ghost" aria-current={screen === n.screen ? "page" : undefined} className={screen === n.screen || (screen === "event-detail" && n.screen === "events") ? "active" : ""} onClick={() => navigate(n.screen)}><n.icon size={19} />{n.label}</Button>)}</nav><div className="sidebar-foot"><div className="avatar">{initials}</div><div className="min-w-0"><strong className="truncate">{user.name}</strong><span className="truncate">{user.email}</span></div><Button variant="ghost" aria-label="Cerrar sesión" onClick={() => { logout(); navigate("events"); }}><LogOut size={19} /></Button></div></>;
   return <div className="app-shell"><aside className="sidebar hidden! min-[761px]:flex!">{navContent}</aside>
-    <main><header className="topbar"><Button variant="ghost" className="menu-btn" aria-label="Abrir menú" aria-expanded={mobile} onClick={() => setMobile(true)}><Menu size={22} /></Button><div className="topbar-copy"><span>Universidad de Antioquia</span><strong>Gestión centralizada de eventos</strong></div><span className="text-sm text-[#526258]">Entorno local de pruebas</span><div className="top-avatar">{initials}</div></header><div className="page">{content}</div></main>
+    <main><header className="topbar"><Button variant="ghost" className="menu-btn" aria-label="Abrir menú" aria-expanded={mobile} onClick={() => setMobile(true)}><Menu size={22} /></Button><div className="topbar-copy"><span>Universidad de Antioquia</span><strong>Gestión centralizada de eventos</strong></div><span className="text-sm text-[#526258]">Plataforma universitaria</span><div className="top-avatar">{initials}</div></header><div className="page">{content}</div></main>
     {mobile && <Modal title="Menú de EventUdeA" onClose={() => setMobile(false)}><div className="grid gap-2 p-5"><div className="role-chip">{labels[user.role]}</div>{nav.map(n => <Button key={n.screen} variant={n.screen === screen ? "secondary" : "ghost"} onClick={() => navigate(n.screen)}><n.icon size={19} />{n.label}</Button>)}<Button variant="danger" onClick={() => { logout(); setMobile(false); route("events"); }}><LogOut size={18} />Cerrar sesión</Button><Button variant="ghost" onClick={() => setMobile(false)}><X size={18} />Cerrar menú</Button></div></Modal>}
   </div>;
 }
