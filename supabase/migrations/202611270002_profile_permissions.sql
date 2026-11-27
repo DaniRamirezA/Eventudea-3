@@ -16,3 +16,18 @@ grant insert, update, delete on public.categories, public.venues, public.certifi
 grant select, insert, update, delete on public.certificate_templates to authenticated;
 grant select on public.profiles to authenticated;
 grant usage, select on all sequences in schema public to authenticated;
+
+-- Organizers can identify attendees registered for their own events.
+drop policy if exists "profiles_read_event_participants" on public.profiles;
+create policy "profiles_read_event_participants" on public.profiles
+for select to authenticated
+using (
+  id = (select auth.uid())
+  or public.is_app_admin()
+  or exists (
+    select 1
+    from public.registrations r
+    join public.events e on e.id = r.event_id
+    where r.user_id = profiles.id and e.organizer_id = (select auth.uid())
+  )
+);
