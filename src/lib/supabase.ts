@@ -19,27 +19,6 @@ export function setSession(session: AuthSession | null) {
   if (typeof window === "undefined") return;
   if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session)); else localStorage.removeItem(SESSION_KEY);
 }
-export function consumeAuthRedirect(): "recovery" | "signup" | "other" | null {
-  if (typeof window === "undefined" || !window.location.hash) return null;
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const accessToken = params.get("access_token");
-  const refreshToken = params.get("refresh_token");
-  const type = params.get("type");
-  if (accessToken && refreshToken) {
-    const expiresIn = Number(params.get("expires_in") || 3600);
-    const user = getSession()?.user;
-    const sessionUser = user;
-    // The Auth user is retrieved from Supabase after storing the token.
-    const pending = { access_token: accessToken, refresh_token: refreshToken, expires_at: Math.floor(Date.now()/1000)+expiresIn, user: sessionUser };
-    if (sessionUser) setSession(pending as AuthSession);
-    else sessionStorage.setItem("eventudea.auth.pending", JSON.stringify({ ...pending, user: null }));
-  }
-  if (type === "recovery" || type === "signup" || params.has("error_description")) {
-    history.replaceState(null, document.title, window.location.pathname + window.location.search);
-    return type === "recovery" ? "recovery" : type === "signup" ? "signup" : "other";
-  }
-  return null;
-}
 async function request(path: string, init: RequestInit = {}, token?: string) {
   const { url, key } = config();
   const response = await fetch(`${url}${path}`, {
@@ -51,6 +30,33 @@ async function request(path: string, init: RequestInit = {}, token?: string) {
   try { data = body ? JSON.parse(body) : null; } catch { data = body; }
   if (!response.ok) throw new SupabaseError(data?.msg || data?.message || data?.error_description || data?.hint || "Error al comunicarse con Supabase.", response.status);
   return data;
+}
+export async function consumeAuthRedirect(): Promise<"recovery" | "signup" | "other" | null> {
+  if (typeof window === "undefined" || !window.location.hash) return null;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token");
+  const type = params.get("type");
+  const errorDescription = params.get("error_description");
+  let flow: "recovery" | "signup" | "other" | null = null;
+  try {
+    if (errorDescription) {
+      flow = "other";
+    } else if (accessToken && refreshToken) {
+      const expiresIn = Number(params.get("expires_in") || 3600);
+      const user = await request("/auth/v1/user", {}, accessToken) as AuthUser;
+      setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        expires_at: Math.floor(Date.now()/1000) + expiresIn,
+        user
+      });
+      flow = type === "recovery" ? "recovery" : type === "signup" ? "signup" : null;
+    }
+  } finally {
+    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+  }
+  return flow;
 }
 export async function signIn(email: string, password: string): Promise<AuthSession> {
   const data = await request("/auth/v1/token?grant_type=password", { method: "POST", body: JSON.stringify({ email, password }) });
