@@ -48,8 +48,10 @@ export class SupabaseRepository {
         }
       }
     }
-    const mappedEvents = (events ?? []).map(eventFrom);
-    mappedEvents.forEach(e => e.registered = registrations.filter(r=>r.eventId===e.id&&!r.cancelled).length);
+    const mappedEvents: ManagedEvent[] = (events ?? []).map((row: Row) => eventFrom(row));
+    mappedEvents.forEach((event: ManagedEvent) => {
+      event.registered = registrations.filter(r => r.eventId === event.id && !r.cancelled).length;
+    });
     const mappedTemplates = (templates ?? []).map((t:Row)=>({id:Number(t.id),name:t.name,description:t.description,active:t.is_active}));
     return {
       version:1, users, events:mappedEvents, registrations,
