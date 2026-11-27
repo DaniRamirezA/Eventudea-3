@@ -39,6 +39,13 @@ export class SupabaseRepository {
       if (users[0]?.role === "administrador") {
         const allProfiles = await authRequest("/rest/v1/profiles?select=*&order=full_name");
         users = (allProfiles ?? []).map(profileFrom);
+      } else if (users[0]?.role === "organizador") {
+        const participantIds = [...new Set(registrations.map(r => r.userId))].filter(id => id !== userId);
+        if (participantIds.length) {
+          const ids = participantIds.map(id => `"${id}"`).join(",");
+          const participants = await authRequest(`/rest/v1/profiles?select=*&id=in.(${ids})`);
+          users = [...users, ...(participants ?? []).map(profileFrom)];
+        }
       }
     }
     const mappedEvents = (events ?? []).map(eventFrom);
