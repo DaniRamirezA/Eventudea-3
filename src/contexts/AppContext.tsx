@@ -35,7 +35,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     let mounted=true;
     const init=async()=>{
       try{
-        const flow=consumeAuthRedirect();
+        const flow=await consumeAuthRedirect();
         const session=await currentSession();
         const id=session?.user?.id??null;
         const data=await repository.load(id);
