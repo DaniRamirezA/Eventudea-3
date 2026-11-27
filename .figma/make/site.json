@@ -1,0 +1,10 @@
+{
+  "description": "Plataforma universitaria para que asistentes descubran e inscriban eventos, organizadores gestionen actividades y administradores supervisen aprobaciones, espacios y asistencia.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

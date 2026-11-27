@@ -1,0 +1,45 @@
+{
+  "name": "figma-make-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "dev:preview": "vite",
+    "build": "NODE_ENV=production next build",
+    "build:preview": "vite build",
+    "preview": "vite preview",
+    "test": "tsx --test tests/*.test.ts",
+    "verify": "pnpm test && tsc --noEmit && pnpm build && pnpm build:preview",
+    "format": "oxfmt"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^7.0.9",
+    "@radix-ui/react-dialog": "^1.3.1",
+    "@radix-ui/react-slot": "^1.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.81.0",
+    "next": "^15.5.29",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.92.0",
+    "tailwind-merge": "^3.7.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "oxfmt": "^0.76.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.0",
+    "vite": "^8.1.7"
+  }
+}
